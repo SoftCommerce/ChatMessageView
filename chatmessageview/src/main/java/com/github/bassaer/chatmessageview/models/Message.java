@@ -2,6 +2,7 @@ package com.github.bassaer.chatmessageview.models;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 
 import com.github.bassaer.chatmessageview.utils.DateFormatter;
 import com.github.bassaer.chatmessageview.utils.DefaultTimeFormatter;
@@ -128,6 +129,11 @@ public class Message {
      * PICTURE message
      */
     private Bitmap mPicture;
+
+    /**
+     * Extra message data
+     */
+    private Bundle mBundle;
 
 
     /**
@@ -426,5 +432,13 @@ public class Message {
 
     public interface OnIconLongClickListener {
         void onIconLongClick(Message message);
+    }
+
+    public void setExtra(Bundle bundle) {
+        mBundle = bundle;
+    }
+
+    public Bundle getExtra() {
+        return mBundle;
     }
 }
