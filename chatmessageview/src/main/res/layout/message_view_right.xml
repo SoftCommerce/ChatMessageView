@@ -13,6 +13,8 @@
         android:layout_gravity="center_vertical|end"
         android:layout_marginEnd="@dimen/spacing_tiny"
         android:layout_marginRight="@dimen/spacing_tiny"
+        android:layout_marginLeft="@dimen/spacing_tiny"
+        android:layout_marginStart="@dimen/spacing_tiny"
         android:orientation="vertical">
 
         <FrameLayout
@@ -49,10 +51,12 @@
 
             </LinearLayout>
 
-            <FrameLayout
+            <LinearLayout
                 android:id="@+id/main_message_container"
+                android:background="@drawable/message_text_shape_right"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
 
         </LinearLayout>
 

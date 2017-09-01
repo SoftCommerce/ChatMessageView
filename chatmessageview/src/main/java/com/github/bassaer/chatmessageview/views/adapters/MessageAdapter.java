@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
@@ -13,13 +14,19 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.bassaer.chatmessageview.R;
 import com.github.bassaer.chatmessageview.models.Message;
 import com.github.bassaer.chatmessageview.models.User;
+import com.github.bassaer.chatmessageview.views.MessageView;
 import com.github.bassaer.chatmessageview.views.RoundImageView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -34,6 +41,7 @@ public class MessageAdapter extends ArrayAdapter<Object> {
     private LayoutInflater mLayoutInflater;
     private ArrayList<Object> mObjects;
     private ArrayList<Object> mViewTypes = new ArrayList<>();
+    private MessageView.OnFileClickListener mFileClickListener;
 
     private Message.OnIconClickListener mOnIconClickListener;
     private Message.OnBubbleClickListener mOnBubbleClickListener;
@@ -65,6 +73,10 @@ public class MessageAdapter extends ArrayAdapter<Object> {
         mViewTypes.add(Message.class);
         mLeftBubbleColor = ContextCompat.getColor(context, R.color.default_left_bubble_color);
         mRightBubbleColor = ContextCompat.getColor(context, R.color.default_right_bubble_color);
+    }
+
+    public void setOnFileClickListener(MessageView.OnFileClickListener listener) {
+        mFileClickListener = listener;
     }
 
     @Override
@@ -127,7 +139,7 @@ public class MessageAdapter extends ArrayAdapter<Object> {
                     convertView = mLayoutInflater.inflate(R.layout.message_view_right, null);
                     holder = new MessageViewHolder();
                     holder.iconContainer = (FrameLayout) convertView.findViewById(R.id.user_icon_container);
-                    holder.mainMessageContainer = (FrameLayout) convertView.findViewById(R.id.main_message_container);
+                    holder.mainMessageContainer = (LinearLayout) convertView.findViewById(R.id.main_message_container);
                     holder.timeText = (TextView) convertView.findViewById(R.id.time_display_text);
                     holder.usernameContainer = (FrameLayout) convertView.findViewById(R.id.message_user_name_container);
                     holder.statusContainer = (FrameLayout) convertView.findViewById(R.id.message_status_container);
@@ -193,7 +205,7 @@ public class MessageAdapter extends ArrayAdapter<Object> {
                     holder.messageText = (TextView) textBubble.findViewById(R.id.message_text);
                     holder.messageText.setText(message.getMessageText());
                     //Set bubble color
-                    setColorDrawable(mRightBubbleColor, holder.messageText.getBackground());
+                    setColorDrawable(mRightBubbleColor, holder.mainMessageContainer.getBackground());
                     //Set message text color
                     holder.messageText.setTextColor(mRightMessageTextColor);
                 }
@@ -211,7 +223,7 @@ public class MessageAdapter extends ArrayAdapter<Object> {
                     convertView = mLayoutInflater.inflate(R.layout.message_view_left, null);
                     holder = new MessageViewHolder();
                     holder.iconContainer = (FrameLayout) convertView.findViewById(R.id.user_icon_container);
-                    holder.mainMessageContainer = (FrameLayout) convertView.findViewById(R.id.main_message_container);
+                    holder.mainMessageContainer = (LinearLayout) convertView.findViewById(R.id.main_message_container);
                     holder.timeText = (TextView) convertView.findViewById(R.id.time_display_text);
                     holder.usernameContainer = (FrameLayout) convertView.findViewById(R.id.message_user_name_container);
                     holder.statusContainer = (FrameLayout) convertView.findViewById(R.id.message_status_container);
@@ -277,8 +289,9 @@ public class MessageAdapter extends ArrayAdapter<Object> {
                     View textBubble = mLayoutInflater.inflate(R.layout.message_text_left, holder.mainMessageContainer);
                     holder.messageText = (TextView) textBubble.findViewById(R.id.message_text);
                     holder.messageText.setText(message.getMessageText());
+
                     //Set bubble color
-                    setColorDrawable(mLeftBubbleColor, holder.messageText.getBackground());
+                    setColorDrawable(mLeftBubbleColor, holder.mainMessageContainer.getBackground());
                     //Set message text color
                     holder.messageText.setTextColor(mLeftMessageTextColor);
                 }
@@ -290,6 +303,15 @@ public class MessageAdapter extends ArrayAdapter<Object> {
                 convertView.setPadding(0, mMessageTopMargin, 0, mMessageBottomMargin);
 
             }
+
+            if (message.getMessageText().trim().isEmpty()) {
+                holder.messageText.setVisibility(View.GONE);
+            } else {
+                holder.messageText.setVisibility(View.VISIBLE);
+            }
+
+            showFiles(holder.mainMessageContainer, message);
+            holder.mainMessageContainer.invalidate();
 
             if (holder.mainMessageContainer != null) {
                 //Set bubble click listener
@@ -340,6 +362,87 @@ public class MessageAdapter extends ArrayAdapter<Object> {
         }
 
         return convertView;
+    }
+
+    private void showFiles(LinearLayout mainMessageContainer, Message message) {
+        Bundle bundle  = message.getExtra();
+        if (bundle != null && bundle.containsKey("files")) {
+            String[] jsonFiles = bundle.getStringArray("files");
+            if (jsonFiles != null) {
+                for (String json : jsonFiles) {
+                    final Integer fileId;
+                    final String fileName;
+                    final String fileType;
+                    final Integer fileSize;
+                    try {
+                        final JSONObject jsonFile = new JSONObject(json);
+                        fileId = jsonFile.getInt("id");
+                        fileName = jsonFile.getString("name");
+                        fileType = jsonFile.getString("type");
+                        fileSize = jsonFile.getInt("size");
+                        View fileView = mLayoutInflater.inflate(R.layout.message_file, mainMessageContainer, false);
+                        ImageView fileIconView = (ImageView) fileView.findViewById(R.id.file_icon);
+                        TextView fileNameView = (TextView) fileView.findViewById(R.id.file_name);
+                        TextView fileSizeView = (TextView) fileView.findViewById(R.id.file_size);
+                        fileNameView.setText(fileName);
+                        fileSizeView.setText("(" + formatFileSize(fileSize) + ")");
+                        switch (fileType) {
+                            case "doc":
+                                fileIconView.setImageResource(R.drawable.doc);
+                                break;
+                            case "xls":
+                                fileIconView.setImageResource(R.drawable.xls);
+                                break;
+                            case "pdf":
+                                fileIconView.setImageResource(R.drawable.pdf);
+                                break;
+                            case "wpd":
+                                fileIconView.setImageResource(R.drawable.wpd);
+                                break;
+                            case "qb":
+                                fileIconView.setImageResource(R.drawable.qb);
+                                break;
+                            case "jpg":
+                            case "jpeg":
+                                fileIconView.setImageResource(R.drawable.jpg);
+                                break;
+                            case "png":
+                                fileIconView.setImageResource(R.drawable.png);
+                                break;
+                            case "tif":
+                            case "tiff":
+                                fileIconView.setImageResource(R.drawable.tiff);
+                                break;
+                            default:
+                                fileIconView.setImageResource(R.drawable.unknown);
+                                break;
+                        }
+                        if (mFileClickListener != null && fileName != null) {
+                            fileView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    mFileClickListener.onFileClick(
+                                            fileId,
+                                            fileName,
+                                            fileType
+                                    );
+                                }
+                            });
+                        }
+                        mainMessageContainer.addView(fileView);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    private static String formatFileSize(int fileSize) {
+        if (fileSize <= 0) return "0";
+        final String[] units = new String[] { "B", "kB", "MB", "GB", "TB" };
+        int digitGroups = (int) (Math.log10(fileSize)/Math.log10(1024));
+        return new DecimalFormat("#,##0.#").format(fileSize/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 
     /**
@@ -435,7 +538,7 @@ public class MessageAdapter extends ArrayAdapter<Object> {
         TextView messageText;
         TextView timeText;
         TextView username;
-        FrameLayout mainMessageContainer;
+        LinearLayout mainMessageContainer;
         FrameLayout usernameContainer;
         FrameLayout statusContainer;
         ImageView statusIcon;

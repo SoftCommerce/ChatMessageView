@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/file_bg"
+    android:padding="5dp"
+    android:layout_margin="5dp">
+    <ImageView
+        android:id="@+id/file_icon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:contentDescription="@string/file_icon"
+        android:scaleType="fitCenter"/>
+    <TextView
+        android:id="@+id/file_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_gravity="start|center_vertical"
+        android:ellipsize="end"
+        android:textSize="@dimen/font_small"
+        android:textColor="@color/fileName"/>
+    <TextView
+        android:id="@+id/file_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_gravity="start|center_vertical"
+        android:textSize="13sp"
+        android:textColor="@color/fileName"/>
+</LinearLayout>

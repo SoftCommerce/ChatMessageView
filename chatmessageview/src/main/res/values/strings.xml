@@ -22,6 +22,7 @@
     <string name="default_user_name_2">Alice</string>
     <string name="send">Send</string>
     <string name="attach">Add attachment</string>
+    <string name="file_icon">File Icon</string>
 
 
 </resources>

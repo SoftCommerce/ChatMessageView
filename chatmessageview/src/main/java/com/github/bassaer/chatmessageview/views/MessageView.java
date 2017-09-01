@@ -231,4 +231,12 @@ public class MessageView extends ListView implements View.OnFocusChangeListener{
     public void setRefreshInterval(long refreshInterval) {
         mRefreshInterval = refreshInterval;
     }
+
+    public interface OnFileClickListener {
+        public void onFileClick(int fileId, String fileName, String fileType);
+    }
+
+    public void setOnFileClickListener(MessageView.OnFileClickListener listener) {
+        mMessageAdapter.setOnFileClickListener(listener);
+    }
 }

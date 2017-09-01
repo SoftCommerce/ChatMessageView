@@ -295,4 +295,8 @@ public class ChatView extends LinearLayout {
     public void scrollToEnd() {
         mMessageView.scrollToEnd();
     }
+
+    public void setOnFileClickListener(MessageView.OnFileClickListener listener) {
+        mMessageView.setOnFileClickListener(listener);
+    }
 }
