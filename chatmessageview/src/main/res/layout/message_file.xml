@@ -20,6 +20,8 @@
         android:layout_marginLeft="5dp"
         android:layout_gravity="start|center_vertical"
         android:ellipsize="end"
+        android:maxLines="1"
+        android:maxWidth="150dp"
         android:textSize="@dimen/font_small"
         android:textColor="@color/fileName"/>
     <TextView
@@ -30,5 +32,5 @@
         android:layout_marginLeft="5dp"
         android:layout_gravity="start|center_vertical"
         android:textSize="13sp"
-        android:textColor="@color/fileName"/>
+        android:textColor="@color/fileSize"/>
 </LinearLayout>

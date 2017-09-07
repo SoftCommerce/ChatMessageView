@@ -11,6 +11,7 @@
 
     <color name="green500">#4CAF50</color>
     <color name="fileName">#222222</color>
+    <color name="fileSize">#444444</color>
 
 
     <!-- Grey scales -->
