@@ -12,6 +12,7 @@ import com.github.bassaer.chatmessageview.views.adapters.MessageAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 

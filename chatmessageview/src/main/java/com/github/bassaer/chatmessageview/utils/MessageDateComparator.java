@@ -11,7 +11,7 @@ import java.util.Locale;
 public class MessageDateComparator implements Comparator<Object> {
     @Override
     public int compare(Object a, Object b) {
-        SimpleDateFormat f = new SimpleDateFormat("MMM. dd, yyyy", Locale.US);
+        SimpleDateFormat f = new SimpleDateFormat("MMM. dd, yyyy", Locale.getDefault());
         Date d1 = new Date();
         Date d2 = new Date();
 
